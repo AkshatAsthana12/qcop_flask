@@ -45,6 +45,8 @@ safety_keywords = ['helmet', 'hardhat', 'safety vest', 'vest', 'goggles', 'boots
 
 @app.post("/analyze/")
 async def analyze_frame(file: UploadFile = File(...)):
+        print("Received file:", file.filename, file.content_type)
+
     # Validate file type
     if not file.content_type or not file.content_type.startswith("image/"):
         return {"error": "Uploaded file is not an image."}
