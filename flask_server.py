@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import boto3
 import cv2
 import numpy as np
-import os
 
 app = FastAPI()
 
@@ -18,8 +17,8 @@ app.add_middleware(
 
 # --- HARDCODED AWS CREDENTIALS (use only for testing!) ---
 AWS_REGION = "us-east-1"
-AWS_ACCESS_KEY_ID = "AKIAUH4GU4K2X5WAPORN"
-AWS_SECRET_ACCESS_KEY = "BGl33enZMW0F3QqweLvK2VgbjIymOSzIrv3RDov4"
+AWS_ACCESS_KEY_ID = "YOUR_HARDCODED_AWS_ACCESS_KEY_ID"
+AWS_SECRET_ACCESS_KEY = "YOUR_HARDCODED_AWS_SECRET_ACCESS_KEY"
 # ---------------------------------------------------------
 
 def get_rekognition_client():
@@ -34,11 +33,6 @@ def get_rekognition_client():
         print(f"Error initializing Rekognition client: {e}")
         raise
 
-collection_id = "new_face_collection"
-image_to_name = {
-    "imag1.jpg": "Akshat",
-    "photo.jpg": "Akshat"
-}
 safety_keywords = ['helmet', 'hardhat', 'safety vest', 'vest', 'goggles', 'boots', 'gloves']
 
 @app.post("/analyze/")
@@ -61,9 +55,8 @@ async def analyze_frame(file: UploadFile = File(...)):
 
     rekognition = get_rekognition_client()
     objects = []
-    faces = []
 
-    # Object detection
+    # Object detection for safety equipment
     try:
         obj_response = rekognition.detect_labels(
             Image={'Bytes': img_bytes},
@@ -78,27 +71,8 @@ async def analyze_frame(file: UploadFile = File(...)):
     except Exception as e:
         return {"error": f"Object detection error: {str(e)}"}
 
-    # Face recognition
-    try:
-        face_response = rekognition.search_faces_by_image(
-            CollectionId=collection_id,
-            Image={'Bytes': img_bytes},
-            FaceMatchThreshold=95,
-            MaxFaces=5
-        )
-        for match in face_response.get("FaceMatches", []):
-            face = match.get("Face", {})
-            face_id = face.get("ExternalImageId", "")
-            similarity = match.get("Similarity", 0)
-            name = image_to_name.get(face_id, "Person")
-            faces.append({"name": name, "similarity": similarity})
-    except Exception as e:
-        return {"error": f"Face recognition error: {str(e)}"}
-
-    # Add a result field for easier client handling
     result = "yes" if objects else "no"
     return {
         "detected_objects": objects,
-        "recognized_faces": faces,
         "result": result
     }
