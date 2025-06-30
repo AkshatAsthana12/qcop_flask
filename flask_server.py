@@ -17,8 +17,8 @@ app.add_middleware(
 
 # --- HARDCODED AWS CREDENTIALS (use only for testing!) ---
 AWS_REGION = "us-east-1"
-AWS_ACCESS_KEY_ID = "YOUR_HARDCODED_AWS_ACCESS_KEY_ID"
-AWS_SECRET_ACCESS_KEY = "YOUR_HARDCODED_AWS_SECRET_ACCESS_KEY"
+AWS_ACCESS_KEY_ID = "AKIAUH4GU4K2X5WAPORN"
+AWS_SECRET_ACCESS_KEY = "BGl33enZMW0F3QqweLvK2VgbjIymOSzIrv3RDov4"
 # ---------------------------------------------------------
 
 def get_rekognition_client():
