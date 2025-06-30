@@ -17,7 +17,9 @@ app.add_middleware(
 rekognition = boto3.client(
     'rekognition',
     region_name='us-east-1'  # or whatever region you're using
-)collection_id = "new_face_collection"
+)
+
+collection_id = "new_face_collection"
 
 image_to_name = {
     "imag1.jpg": "Akshat",
