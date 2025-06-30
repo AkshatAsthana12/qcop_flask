@@ -21,7 +21,6 @@ AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
-# Create Rekognition client with error handling
 def get_rekognition_client():
     try:
         if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
@@ -47,7 +46,7 @@ safety_keywords = ['helmet', 'hardhat', 'safety vest', 'vest', 'goggles', 'boots
 @app.post("/analyze/")
 async def analyze_frame(file: UploadFile = File(...)):
     # Validate file type
-    if not file.content_type.startswith("image/"):
+    if not file.content_type or not file.content_type.startswith("image/"):
         return {"error": "Uploaded file is not an image."}
     try:
         contents = await file.read()
@@ -72,8 +71,8 @@ async def analyze_frame(file: UploadFile = File(...)):
             MinConfidence=75
         )
         for label in obj_response.get("Labels", []):
-            name = label.get("Name","")
-            confidence = label.get("Confidence",0)
+            name = label.get("Name", "")
+            confidence = label.get("Confidence", 0)
             if any(keyword in name.lower() for keyword in safety_keywords):
                 objects.append({"name": name, "confidence": confidence})
     except Exception as e:
@@ -96,7 +95,10 @@ async def analyze_frame(file: UploadFile = File(...)):
     except Exception as e:
         return {"error": f"Face recognition error: {str(e)}"}
 
+    # Add a result field for easier client handling
+    result = "yes" if objects else "no"
     return {
         "detected_objects": objects,
-        "recognized_faces": faces
+        "recognized_faces": faces,
+        "result": result
     }
