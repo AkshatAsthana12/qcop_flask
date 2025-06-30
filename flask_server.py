@@ -16,22 +16,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# AWS Rekognition setup with environment fallback
-AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
-AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+# --- HARDCODED AWS CREDENTIALS (use only for testing!) ---
+AWS_REGION = "us-east-1"
+AWS_ACCESS_KEY_ID = "AKIAUH4GU4K2X5WAPORN"
+AWS_SECRET_ACCESS_KEY = "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"
+# ---------------------------------------------------------
 
 def get_rekognition_client():
     try:
-        if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-            return boto3.client(
-                'rekognition',
-                region_name=AWS_REGION,
-                aws_access_key_id=AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=AWS_SECRET_ACCESS_KEY
-            )
-        else:
-            return boto3.client('rekognition', region_name=AWS_REGION)
+        return boto3.client(
+            'rekognition',
+            region_name=AWS_REGION,
+            aws_access_key_id=AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+        )
     except Exception as e:
         print(f"Error initializing Rekognition client: {e}")
         raise
